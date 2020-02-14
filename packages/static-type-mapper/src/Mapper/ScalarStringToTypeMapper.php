@@ -12,11 +12,13 @@ use PHPStan\Type\FloatType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NullType;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\ResourceType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VoidType;
+use Rector\NodeTypeResolver\ClassExistenceStaticHelper;
 
 final class ScalarStringToTypeMapper
 {
@@ -53,6 +55,12 @@ final class ScalarStringToTypeMapper
 
         if ($loweredScalarName === 'mixed') {
             return new MixedType(true);
+        }
+
+        $scalarName = ltrim($scalarName, '\\');
+
+        if (ClassExistenceStaticHelper::doesClassLikeExist($scalarName)) {
+            return new ObjectType($scalarName);
         }
 
         return new MixedType();
